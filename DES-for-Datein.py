@@ -14,12 +14,10 @@ def Key_Eingabe():
         key = hexZuBits(key)
         Rundenschluesselerstellen(key)
         button_für_Einagbe2.config(state="normal")
-        print(Rundenschluesselarray)
-    if len(key) == 64:
+    elif len(key) == 64:
         Rundenschluesselerstellen(key)
         button_für_Einagbe2.config(state="normal")
-        print(Rundenschluesselarray)
-    if len(key) != 16 and len(key) != 64:
+    elif len(key) != 16 and len(key) != 64:
         fehlerhafteeingabe.config(text=f"Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder 64 Bits\n sie haben {len(key)} bits eingeben")
         root.after(2000,clear_error_message)
 
@@ -72,7 +70,6 @@ def Rundenschluesselerstellen(Schluessel):
     for x in range(len(PC_1)):
         Schluessel_nach_PC_1 += Schluessel[PC_1[x]]
         # Schlüssel aufteilen und in C und D abschnitt einfügen.
-    print(Schluessel_nach_PC_1)
     C = Schluessel_nach_PC_1[0:28]
     D = Schluessel_nach_PC_1[28:]
     C_abschnitt.append(C)
@@ -183,4 +180,29 @@ button_für_Einagbe2 = tk.Button(root,text="Datenbit Eingabe bestätigen.", comm
 button_für_Einagbe2.place(x=430,y=140)
 fehlerhafteeingabe = tk.Label(root,fg="red")
 fehlerhafteeingabe.place(x=430,y=100)
+
+def zum_Schlüsselfahplan_switchen():
+    root.withdraw()
+    open_Schlüsselfahrplan()
+def open_Schlüsselfahrplan():
+    global Schlüsselfahrplan
+    Schlüsselfahrplan = tk.Toplevel()
+    Schlüsselfahrplan.title("Hier werden die Schlüssel 1 bis 16 aufgelistet.")
+    Schlüsselfahrplan.geometry("1200x800")
+    Rundenschluesselarray2 = Rundenschluesselarray[1:]
+    Rundenschlüssel = "\n".join(Rundenschluesselarray2)
+    Rundenschlüssel_label = tk.Label(Schlüsselfahrplan,text=Rundenschlüssel)
+    Rundenschlüssel_label.pack()
+    button_zurück_zum_Hauptbildschirm = tk.Button(Schlüsselfahrplan, text="Zurück zum Hauptbildschirm",command=zurück_zum_Hauptbildschirm)
+    button_zurück_zum_Hauptbildschirm.place(x=10,y=10)
+
+
+
+def zurück_zum_Hauptbildschirm():
+    Schlüsselfahrplan.withdraw()
+    root.deiconify()
+button_für_Schlüsselfahrplan = tk.Button(root,text="Schlüsselfahrplan anschauen",command=zum_Schlüsselfahplan_switchen)
+button_für_Schlüsselfahrplan.place(x=600,y=600)
+
+
 root.mainloop()

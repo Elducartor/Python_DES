@@ -14,9 +14,11 @@ def Key_Eingabe():
         key = hexZuBits(key)
         Rundenschluesselerstellen(key)
         button_für_Einagbe2.config(state="normal")
+        button_für_Schlüsselfahrplan.config(state="normal")
     elif len(key) == 64:
         Rundenschluesselerstellen(key)
         button_für_Einagbe2.config(state="normal")
+        button_für_Schlüsselfahrplan.config(state="normal")
     elif len(key) != 16 and len(key) != 64:
         fehlerhafteeingabe.config(text=f"Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder 64 Bits\n sie haben {len(key)} bits eingeben")
         root.after(2000,clear_error_message)
@@ -189,11 +191,13 @@ def open_Schlüsselfahrplan():
     Schlüsselfahrplan = tk.Toplevel()
     Schlüsselfahrplan.title("Hier werden die Schlüssel 1 bis 16 aufgelistet.")
     Schlüsselfahrplan.geometry("1200x800")
-    Rundenschluesselarray2 = Rundenschluesselarray[1:]
+    Rundenschluesselarray2 = []
+    for x in range(1,len(Rundenschluesselarray)):
+        Rundenschluesselarray2.append("key nummer" + str(x) + "\n" + Rundenschluesselarray[x])
     Rundenschlüssel = "\n".join(Rundenschluesselarray2)
     Rundenschlüssel_label = tk.Label(Schlüsselfahrplan,text=Rundenschlüssel)
     Rundenschlüssel_label.pack()
-    button_zurück_zum_Hauptbildschirm = tk.Button(Schlüsselfahrplan, text="Zurück zum Hauptbildschirm",command=zurück_zum_Hauptbildschirm)
+    button_zurück_zum_Hauptbildschirm = tk.Button(Schlüsselfahrplan, text="Zurück zum Hauptbildschirm", command=zurück_zum_Hauptbildschirm)
     button_zurück_zum_Hauptbildschirm.place(x=10,y=10)
 
 
@@ -201,8 +205,8 @@ def open_Schlüsselfahrplan():
 def zurück_zum_Hauptbildschirm():
     Schlüsselfahrplan.withdraw()
     root.deiconify()
-button_für_Schlüsselfahrplan = tk.Button(root,text="Schlüsselfahrplan anschauen",command=zum_Schlüsselfahplan_switchen)
-button_für_Schlüsselfahrplan.place(x=600,y=600)
+button_für_Schlüsselfahrplan = tk.Button(root,text="Schlüsselfahrplan anschauen",command=zum_Schlüsselfahplan_switchen,state="disabled")
+button_für_Schlüsselfahrplan.place(x=670,y=100)
 
 
 root.mainloop()

@@ -20,31 +20,47 @@ def Key_Eingabe():
         button_für_Einagbe2.config(state="normal")
         button_für_Schlüsselfahrplan.config(state="normal")
     elif len(key) != 16 and len(key) != 64:
-        fehlerhafteeingabe.config(text=f"Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder 64 Bits\n sie haben {len(key)} bits eingeben")
+        fehlerhafteeingabe.config(text=f"Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder 64 Bits eingeben \n sie haben {len(key)} stellen eingeben")
         root.after(2000,clear_error_message)
-
-def Eingangsbits_Eingabe():
-    Eingabe = Eingangs_daten_wert.get()
+def Verschlüsselung(Eingabe):
     if len(Eingabe) == 16:
         Eingabex = hexZuBits(Eingabe)
-        Aufteilen(Eingabex)
-        for Runde in range(16):
-            aktuelles_R = expandieren(Rechtehaelfte[Runde])
-            sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[Runde+1]), Runde)
-        ergebnis = Ausgabe(Linkehaelfte[-1],Rechtehaelfte[-1])
-        Ausgabe_labe = tk.Label(root,text=f"das Ergebnis ist in Hexadezimal:{ergebnis}")
-        Ausgabe_labe.place(x=100,y=400)
     if len(Eingabe) == 64:
-        Eingabex = Eingabe_permutieren(Eingabe)
-        Aufteilen(Eingabex)
-        for Runde in range(16):
-            aktuelles_R = expandieren(Rechtehaelfte[Runde])
-            sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[Runde+1]), Runde)
-        ergebnis = Ausgabe(Linkehaelfte[-1], Rechtehaelfte[-1])
-        Ausgabe_labe = tk.Label(root, text=f"das Ergebnis ist in Hexadezimal:{ergebnis}")
-        Ausgabe_labe.place(x=100,y=400)
+        Eingabex = Eingabe
+    Eingabex = hexZuBits(Eingabe)
+    Aufteilen(Eingabe_permutieren(Eingabex))
+    for Runde in range(16):
+        aktuelles_R = expandieren(Rechtehaelfte[Runde])
+        sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[Runde + 1]), Runde)
+    ergebnis = Ausgabe(Linkehaelfte[-1], Rechtehaelfte[-1])
+    print(Rechtehaelfte)
+    print(Linkehaelfte)
+    Ausgabe_labe = tk.Label(root, text=f"das Ergebnis ist in Hexadezimal:{ergebnis}")
+    Ausgabe_labe.place(x=100, y=400)
+    return ergebnis
+
+def Entschlüsselung(Eingabe):
+    if len(Eingabe) == 16:
+        Eingabex = hexZuBits(Eingabe)
+    if len(Eingabe) == 64:
+        Eingabex = Eingabe
+    # braucht seine eignen Rechehälfte und Linkehälfte Array
+    Aufteilen(Eingangs_permutation_entschlüsselung(Eingabex))
+    for Runde in range(15,-1,-1):
+        aktuelles_R = expandieren(Rechtehaelfte[Runde-1])
+        sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[Runde]), Runde)
+    ergebnis = Ausgabe_entschlüsselung(Linkehaelfte[1], Rechtehaelfte[1])
+
+    print(f"Rechtehälfte der entschlüsselung: {Rechtehaelfte}")
+    Ausgabe_labe2 = tk.Label(root, text=f"das Ergebnis ist in Hexadezimal:{ergebnis}")
+    Ausgabe_labe2.place(x=100, y=600)
+def Eingangsbits_Eingabe():
+    Eingabe = Eingangs_daten_wert.get()
+    if len(Eingabe) == 16 or len(Eingabe) == 64:
+        Verschlüsselung(Eingabe)
+        Entschlüsselung(Verschlüsselung(Eingabe))
     if len(Eingabe) != 16 and len(Eingabe) != 64:
-        fehlerhafteeingabe.config(text=f"Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder 64 Bits\n sie haben {len(Eingabe)} bits eingeben")
+        fehlerhafteeingabe.config(text=f"Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder 64 Bitseingeben \n sie haben {len(Eingabe)} stellen eingeben")
         root.after(2000,clear_error_message)
 
 Rundenschluesselarray = []
@@ -54,8 +70,12 @@ def Eingabe_permutieren(string):
         nach_perm += string[Eingangspermutation[x]]
 
     return nach_perm
-
-#Eingabe_nach_perm = Eingabe_permutieren(Eingabe())
+def Eingangs_permutation_entschlüsselung(string):
+    nach_perm = ""
+    for x in range(len(Ausgangspermutation)):
+        nach_perm += string[Ausgangspermutation[x]]
+        
+    return nach_perm
 Linkehaelfte = []
 Rechtehaelfte = []
 def Aufteilen(string):
@@ -163,6 +183,14 @@ def Ausgabe(string1,string2):
         nach_permutation += vor_permutation[Ausgangspermutation[x]]
 
     return binzuHex(nach_permutation)
+
+def Ausgabe_entschlüsselung(string1,string2):
+    vor_permutation = string2 + string1
+    nach_permutation = ""
+    for x in range(len(Eingangspermutation)):
+        nach_permutation += vor_permutation[Ausgangspermutation[x]]
+
+    return binzuHex(nach_permutation)
 """
 print(binzuHex(nach_ausgabepermutation))"""
 
@@ -181,7 +209,7 @@ button_für_Einagbe.place(x=430,y=100)
 button_für_Einagbe2 = tk.Button(root,text="Datenbit Eingabe bestätigen.", command=Eingangsbits_Eingabe,state="disabled")
 button_für_Einagbe2.place(x=430,y=140)
 fehlerhafteeingabe = tk.Label(root,fg="red")
-fehlerhafteeingabe.place(x=430,y=100)
+fehlerhafteeingabe.place(x=430,y=400)
 
 def zum_Schlüsselfahplan_switchen():
     root.withdraw()

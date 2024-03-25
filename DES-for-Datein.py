@@ -28,16 +28,16 @@ def Verschlüsselung(Eingabe):
     if len(Eingabe) == 64:
         Eingabex = Eingabe
     Eingabex = hexZuBits(Eingabe)
-    Aufteilen(Eingabe_permutieren(Eingabex))
+    Aufteilen(Eingabe_permutieren(Eingabex), Linkehaelfte, Rechtehaelfte)
     for Runde in range(16):
         aktuelles_R = expandieren(Rechtehaelfte[Runde])
-        sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[Runde + 1]), Runde)
+        sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[Runde + 1]), Runde, Linkehaelfte, Rechtehaelfte)
+        print(f"Der Rundenschlüssel für die aktuelle verschlüsselung: {Rundenschluesselarray[Runde + 1]}")
+
+
     ergebnis = Ausgabe(Linkehaelfte[-1], Rechtehaelfte[-1])
-    print(Rechtehaelfte)
-    print(Linkehaelfte)
     Ausgabe_labe = tk.Label(root, text=f"das Ergebnis ist in Hexadezimal:{ergebnis}")
     Ausgabe_labe.place(x=100, y=400)
-    return ergebnis
 
 def Entschlüsselung(Eingabe):
     if len(Eingabe) == 16:
@@ -45,20 +45,26 @@ def Entschlüsselung(Eingabe):
     if len(Eingabe) == 64:
         Eingabex = Eingabe
     # braucht seine eignen Rechehälfte und Linkehälfte Array
-    Aufteilen(Eingangs_permutation_entschlüsselung(Eingabex))
-    for Runde in range(15,-1,-1):
-        aktuelles_R = expandieren(Rechtehaelfte[Runde-1])
-        sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[Runde]), Runde)
-    ergebnis = Ausgabe_entschlüsselung(Linkehaelfte[1], Rechtehaelfte[1])
+    Aufteilen(Eingangs_permutation_entschlüsselung(Eingabex), Linkehaelfte_entschlüsselung, Rechtehaelfte_entschlüsselung)
+    for Runde in range(16):
+        aktuelles_R = expandieren(Rechtehaelfte_entschlüsselung[Runde])
+        if Runde == 0:
+            sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[-1]), Runde,
+                            Linkehaelfte_entschlüsselung, Rechtehaelfte_entschlüsselung)
+            print("Rundenschlüssel 1:" + Rundenschluesselarray[-1])
+        sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[16-Runde]), Runde, Linkehaelfte_entschlüsselung, Rechtehaelfte_entschlüsselung)
+        if Runde != 0:
+            print(f"Der Rundenschlüssel für die aktuelle entschlüsselung: {Rundenschluesselarray[15-Runde]}")
+    ergebnis = Ausgabe_entschlüsselung(Linkehaelfte_entschlüsselung[-1], Rechtehaelfte_entschlüsselung[-1])
 
-    print(f"Rechtehälfte der entschlüsselung: {Rechtehaelfte}")
+
     Ausgabe_labe2 = tk.Label(root, text=f"das Ergebnis ist in Hexadezimal:{ergebnis}")
     Ausgabe_labe2.place(x=100, y=600)
 def Eingangsbits_Eingabe():
     Eingabe = Eingangs_daten_wert.get()
     if len(Eingabe) == 16 or len(Eingabe) == 64:
         Verschlüsselung(Eingabe)
-        Entschlüsselung(Verschlüsselung(Eingabe))
+        Entschlüsselung(Eingabe)
     if len(Eingabe) != 16 and len(Eingabe) != 64:
         fehlerhafteeingabe.config(text=f"Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder 64 Bitseingeben \n sie haben {len(Eingabe)} stellen eingeben")
         root.after(2000,clear_error_message)
@@ -78,10 +84,11 @@ def Eingangs_permutation_entschlüsselung(string):
     return nach_perm
 Linkehaelfte = []
 Rechtehaelfte = []
-def Aufteilen(string):
-    Linkehaelfte.append(string[:32])
-    Rechtehaelfte.append(string[32:])
-#Aufteilen(Eingabe_nach_perm)
+Rechtehaelfte_entschlüsselung = []
+Linkehaelfte_entschlüsselung = []
+def Aufteilen(string,Array,Array1):
+    Array.append(string[:32])
+    Array1.append(string[32:])
 zweistellenschiebe_runde = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14]
 einstellenschiebe_runde = [0, 1, 8, 15]
 
@@ -132,7 +139,7 @@ def xor_verrechnen(string1,string2):
 
     return Rx_xor_Key
 
-def sboxen_auslesen(string,Runde):
+def sboxen_auslesen(string,Runde,Array,Array1):
     if len(string) != 48:
         return "Fehler!"
     auslese_array = []
@@ -166,14 +173,14 @@ def sboxen_auslesen(string,Runde):
     sbox_ausgabe_bits = dezimal_in_bits(sbox_ausgabe)
     for z in range(len(P_permutation)):
         new_R += sbox_ausgabe_bits[P_permutation[z]]
-    old_L = Linkehaelfte[Runde]
+    old_L = Array[Runde]
     # new_L means the left side after xor with f(R)
     for bits in range(len(old_L)):
         bit = int(old_L[bits]) ^ int(new_R[bits])
         new_L += str(bit)
 
-    Linkehaelfte.append(Rechtehaelfte[-1])
-    Rechtehaelfte.append(new_L)
+    Array.append(Array1[-1])
+    Array1.append(new_L)
 
 
 def Ausgabe(string1,string2):

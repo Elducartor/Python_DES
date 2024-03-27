@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog
 
 from Zahlensysteme_ändern import hexZuBits
 import Rundenschluesselerstellen
@@ -20,10 +21,12 @@ def Key_Eingabe():
         Rundenschluesselerstellen.Rundenschluesselerstellen(key)
         button_für_Einagbe2.config(state="normal")
         button_für_Schlüsselfahrplan.config(state="normal")
+        button_für_datei.config(state="normal")
     elif len(key) == 64:
         Rundenschluesselerstellen.Rundenschluesselerstellen(key)
         button_für_Einagbe2.config(state="normal")
         button_für_Schlüsselfahrplan.config(state="normal")
+        button_für_datei.config(state="normal")
     elif len(key) != 16 and len(key) != 64:
         fehlerhafteeingabe.config(text="Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder" +
                                         f"64 Bits eingeben \n sie haben {len(key)} stellen eingeben")
@@ -91,5 +94,23 @@ def zurück_zum_Hauptbildschirm():
 button_für_Schlüsselfahrplan = tk.Button(root,text="Schlüsselfahrplan anschauen",command=zum_Schlüsselfahplan_switchen,state="disabled")
 button_für_Schlüsselfahrplan.place(x=670,y=100)
 
+def Datei_verschlüsselung():
+    dateiname = filedialog.askopenfilename()
+    verschlüsselter_bitstring = ""
+    if dateiname:
+        with open(dateiname, "rb") as datei:
+            datei_inhalt = datei.read()
+            bit_string = ''.join(format(byte, '08b') for byte in datei_inhalt)
+            padding_bits = 64 - (len(bit_string) % 64) # Paddingbits anwenden.
+            if len(datei_inhalt) % 64 != 0:
+                bit_string += "0" * padding_bits
+    Block_groeße = 64
+    for index in range(0,len(bit_string),Block_groeße):
+        block = bit_string[index:index+Block_groeße]
+        verschlüsselter_bitstring += Verschluesselung_DES.Verschlüsselung(block)
 
+    with open("verschlüsselung im format","wb") as datei2:
+        datei2.write(verschlüsselter_bitstring.encode("utf-8"))
+button_für_datei = tk.Button(root,text="Datei verschlüsseln", command=Datei_verschlüsselung, state="disabled")
+button_für_datei.place(x=100,y=200)
 root.mainloop()

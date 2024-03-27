@@ -45,3 +45,4 @@ def sboxen_auslesen(string,Runde,Array,Array1):
     Array1.append(new_L)
 
 
+

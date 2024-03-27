@@ -1,3 +1,9 @@
+
+from DES_Permutationen import PC_1, PC_2
+zweistellenschiebe_runde = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14]
+einstellenschiebe_runde = [0, 1, 8, 15]
+Rundenschluesselarray = []
+
 def Rundenschluesselerstellen(Schluessel):
     C_abschnitt = []
     D_abschnitt = []

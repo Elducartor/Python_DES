@@ -1,3 +1,6 @@
+from DES_Sboxen import sbox1, sbox2, sbox3, sbox4, sbox5, sbox6, sbox7, sbox8
+from Zahlensysteme_ändern import dezimal_in_bits
+from DES_Permutationen import P_permutation
 def sboxen_auslesen(string,Runde,Array,Array1):
     if len(string) != 48:
         return "Fehler!"

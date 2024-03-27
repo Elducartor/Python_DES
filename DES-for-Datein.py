@@ -2,6 +2,10 @@ import tkinter as tk
 from DES_Sboxen import sbox1,sbox2,sbox3,sbox4,sbox5,sbox6,sbox7,sbox8
 from DES_Permutationen import Expansion,Eingangspermutation,P_permutation,Ausgangspermutation,PC_1,PC_2
 from Zahlensysteme_ändern import dezimal_in_bits,binzuHex,hexZuBits
+from sbox_auslesen import sboxen_auslesen
+from Rundenschluesselerstellen import Rundenschluesselerstellen
+from Entschluesselung_DES import Entschlüsselung
+from Verschluesselung_DES import Verschlüsselung
 root = tk.Tk()
 root.geometry("1200x800")
 root.title("DES Verschlüsselung")
@@ -22,6 +26,8 @@ def Key_Eingabe():
     elif len(key) != 16 and len(key) != 64:
         fehlerhafteeingabe.config(text=f"Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder 64 Bits eingeben \n sie haben {len(key)} stellen eingeben")
         root.after(2000,clear_error_message)
+
+"""
 def Verschlüsselung(Eingabe):
     if len(Eingabe) == 16:
         Eingabex = hexZuBits(Eingabe)
@@ -36,6 +42,8 @@ def Verschlüsselung(Eingabe):
     Ausgabe_labe = tk.Label(root, text=f"das Ergebnis ist in Hexadezimal:{ergebnis}")
     Ausgabe_labe.place(x=100, y=400)
 
+"""
+"""
 def Entschlüsselung(Eingabe):
     if len(Eingabe) == 16:
         Eingabex = hexZuBits(Eingabe)
@@ -51,7 +59,7 @@ def Entschlüsselung(Eingabe):
     Ausgabe_labe2.place(x=100, y=600)
     print(Rechtehaelfte_entschlüsselung)
 
-
+"""
 def Eingangsbits_Eingabe():
     Eingabe = Eingangs_daten_wert.get()
     if len(Eingabe) == 16 or len(Eingabe) == 64:
@@ -79,38 +87,7 @@ def Aufteilen(string,Array,Array1):
 zweistellenschiebe_runde = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14]
 einstellenschiebe_runde = [0, 1, 8, 15]
 
-def Rundenschluesselerstellen(Schluessel):
-    C_abschnitt = []
-    D_abschnitt = []
-    Schluessel_nach_PC_1 = ""
-    for x in range(len(PC_1)):
-        Schluessel_nach_PC_1 += Schluessel[PC_1[x]]
-        # Schlüssel aufteilen und in C und D abschnitt einfügen.
-    C = Schluessel_nach_PC_1[0:28]
-    D = Schluessel_nach_PC_1[28:]
-    C_abschnitt.append(C)
-    D_abschnitt.append(D)
-    #alle Rundenschlüssel erstelln
-    for x in range(17):
-        if x in zweistellenschiebe_runde:
-                c_rotieren = C_abschnitt[x][2:] + C_abschnitt[x][:2]
-                d_rotieren = D_abschnitt[x][2:] + D_abschnitt[x][:2]
-                C_abschnitt.append(c_rotieren)
-                D_abschnitt.append(d_rotieren)
 
-        if x in einstellenschiebe_runde:
-                c_rotieren = C_abschnitt[x][1:] + C_abschnitt[x][:1]
-                d_rotieren = D_abschnitt[x][1:] + D_abschnitt[x][:1]
-                C_abschnitt.append(c_rotieren)
-                D_abschnitt.append(d_rotieren)
-
-        # +1 ,weil ich bei Runde 0 den ersten Index in C_abschnitt und D_abschnitt anspreche möchte
-        Rundenschluessel_vor_perm = str(C_abschnitt[x]) + str(D_abschnitt[x])
-        Rundenschluessel = ""
-        for index in range(len(PC_2)):
-            Rundenschluessel += Rundenschluessel_vor_perm[PC_2[index]]
-
-        Rundenschluesselarray.append(Rundenschluessel)
 def expandieren(string):
     R_nach_expand = ""
     for x in range(len(Expansion)):
@@ -125,7 +102,7 @@ def xor_verrechnen(string1,string2):
         Rx_xor_Key += str(bit)
 
     return Rx_xor_Key
-
+"""
 def sboxen_auslesen(string,Runde,Array,Array1):
     if len(string) != 48:
         return "Fehler!"
@@ -169,7 +146,7 @@ def sboxen_auslesen(string,Runde,Array,Array1):
     Array.append(Array1[-1])
     Array1.append(new_L)
 
-
+"""
 def Ausgabe(string1,string2):
     vor_permutation = string2+string1
     nach_permutation = ""

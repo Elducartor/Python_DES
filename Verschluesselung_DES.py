@@ -49,4 +49,6 @@ def Verschlüsselung(Eingabe):
         aktuelles_R = expandieren(Rechtehaelfte[Runde])
         sboxen_auslesen(xor_verrechnen(aktuelles_R, Rundenschluesselarray[Runde + 1]), Runde, Linkehaelfte, Rechtehaelfte)
     ergebnis = Ausgabe(Linkehaelfte[-1], Rechtehaelfte[-1])
+    Linkehaelfte.clear()
+    Rechtehaelfte.clear()
     return ergebnis

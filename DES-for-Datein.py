@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+import os
 
 from Zahlensysteme_ändern import hexZuBits
 import Rundenschluesselerstellen
@@ -22,11 +23,13 @@ def Key_Eingabe():
         button_für_Einagbe2.config(state="normal")
         button_für_Schlüsselfahrplan.config(state="normal")
         button_für_datei.config(state="normal")
+        button_für_entschlüsselung.config(state="normal")
     elif len(key) == 64:
         Rundenschluesselerstellen.Rundenschluesselerstellen(key)
         button_für_Einagbe2.config(state="normal")
         button_für_Schlüsselfahrplan.config(state="normal")
         button_für_datei.config(state="normal")
+        button_für_entschlüsselung.config(state="normal")
     elif len(key) != 16 and len(key) != 64:
         fehlerhafteeingabe.config(text="Fehler: falsche Anzahl an Bits. Entweder 16 Hexadezimalzahlen oder" +
                                         f"64 Bits eingeben \n sie haben {len(key)} stellen eingeben")
@@ -94,6 +97,17 @@ def zurück_zum_Hauptbildschirm():
 button_für_Schlüsselfahrplan = tk.Button(root,text="Schlüsselfahrplan anschauen",command=zum_Schlüsselfahplan_switchen,state="disabled")
 button_für_Schlüsselfahrplan.place(x=670,y=100)
 
+
+def hexstring_zu_datei(hexstring, dateiname):
+    try:
+        with open(dateiname, "wb") as datei:
+            datei.write(bytes.fromhex(hexstring))
+        print("Datei erfolgreich erstellt:", dateiname)
+    except Exception as e:
+        print("Fehler beim Erstellen der Datei:", str(e))
+
+# Beispielaufruf
+
 def Datei_verschlüsselung():
     dateiname = filedialog.askopenfilename()
     verschlüsselter_bitstring = ""
@@ -107,10 +121,35 @@ def Datei_verschlüsselung():
     Block_groeße = 64
     for index in range(0,len(bit_string),Block_groeße):
         block = bit_string[index:index+Block_groeße]
-        verschlüsselter_bitstring += Verschluesselung_DES.Verschlüsselung(block)
+        verschlüsselter_block = Verschluesselung_DES.Verschlüsselung(block)
+        verschlüsselter_bitstring += verschlüsselter_block
 
-    with open("verschlüsselung im format","wb") as datei2:
-        datei2.write(verschlüsselter_bitstring.encode("utf-8"))
+    Datei_Name = os.path.basename(dateiname)
+    hexstring_zu_datei(verschlüsselter_bitstring,f"verschlüsselt {Datei_Name}" )
+
+#EBACEBACEBACEBAC
+def Datei_entschlüsseln():
+    dateiname = filedialog.askopenfilename()
+    entschlüsselter_bitstring = ""
+    if dateiname:
+        with open(dateiname, "rb") as datei:
+            datei_inhalt = datei.read()
+            print(datei_inhalt)
+            bit_string = ''.join(format(byte, '08b') for byte in datei_inhalt)
+            padding_bits = 64 - (len(bit_string) % 64)  # Paddingbits anwenden.
+            if len(datei_inhalt) % 64 != 0:
+                bit_string += "0" * padding_bits
+    Block_groeße = 64
+    for index in range(0, len(bit_string), Block_groeße):
+        block = bit_string[index:index + Block_groeße]
+        entschlüsselter_bitstring += Entschluesselung_DES.Entschlüsselung(block)
+
+    Datei_Name = os.path.basename(dateiname)
+    hexstring_zu_datei(entschlüsselter_bitstring,f"entschlüsselt {Datei_Name}")
+
+
+button_für_entschlüsselung = tk.Button(root,text="Datei entschlüsseln", command=Datei_entschlüsseln, state="disabled")
+button_für_entschlüsselung.place(x=600,y=200)
 button_für_datei = tk.Button(root,text="Datei verschlüsseln", command=Datei_verschlüsselung, state="disabled")
 button_für_datei.place(x=100,y=200)
 root.mainloop()
